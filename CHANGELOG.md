@@ -25,7 +25,7 @@
 - Comprehensive safe area handling guidance
 - Touch event best practices for iOS PWA mode
 - Splash screen requirements and media query patterns
-- Z-index considerations for iOS Safari
+- **backdrop-filter stacking context warning** — iOS Safari creates isolated stacking contexts for elements with backdrop-blur, causing z-index issues. Solution: use `transform: translate3d(0,0,0)` to force GPU layer
 
 ### Changed
 - **BREAKING**: Total scoring increased from 150 to **160 points**

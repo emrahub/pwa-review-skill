@@ -452,9 +452,20 @@ When generating the report, include these platform-specific notes if relevant:
 - Without splash screens, iOS shows blank white screen during PWA launch
 - Each iPhone/iPad dimension needs its own splash image (portrait and landscape)
 
-### Z-Index Considerations
-- Toast/notification components must have high z-index (e.g., `z-[9999]`) to appear above fixed headers
-- iOS Safari has stricter stacking context behavior than other browsers
+### Z-Index & Stacking Context (Critical)
+- **backdrop-filter creates new stacking context**: Headers with `backdrop-blur` or `backdrop-filter` create isolated stacking contexts in iOS Safari. Elements with higher z-index values may still appear BEHIND these elements.
+- **Fix**: Add `transform: translate3d(0,0,0)` to elements that need to appear above backdrop-filter elements. This forces GPU layer rendering and fixes stacking order.
+- Toast/notification components must have high z-index (e.g., `z-[9999]`) AND `transform: translate3d(0,0,0)` to appear above blurred headers
+- iOS Safari has stricter stacking context behavior than Chrome/Firefox
+
+**Example fix for notifications above blurred headers:**
+```css
+.notification {
+  position: fixed;
+  z-index: 9999;
+  transform: translate3d(0,0,0); /* Forces GPU layer, fixes iOS stacking */
+}
+```
 
 ---
 
