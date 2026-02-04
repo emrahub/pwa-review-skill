@@ -136,6 +136,9 @@ Total: 123 points across 10 categories.
 | share_target | 1 | Valid action + params + optional enctype |
 | related_applications | 1 | Listed but NOT blocking (prefer_related=false) |
 | iOS warnings | — | Push/badge/sync limitations (info only) |
+| note_taking | — | ChromeOS lock screen notes integration |
+| iarc_rating_id | — | IARC age rating for app store distribution |
+| widgets | — | Windows 11 Widgets Board integration |
 
 ### Why These Checks Matter
 
@@ -148,6 +151,9 @@ These are **PWA-exclusive** features that Lighthouse doesn't audit:
 - **scope_extensions**: Allow PWA to span multiple origins
 - **edge_side_panel**: Enable PWA in Edge sidebar
 - **tabbed**: Multi-tab PWA experience (experimental)
+- **note_taking**: ChromeOS lock screen quick notes (new_note_url)
+- **iarc_rating_id**: International Age Rating Coalition for app store compliance
+- **widgets**: Windows 11 Widgets Board with Adaptive Cards templates
 
 ## Grading Scale
 

@@ -49,6 +49,9 @@ This category includes PWA-exclusive checks that **no other tool audits**:
 - **edge_side_panel** — Microsoft Edge sidebar integration
 - **tabbed display** — Multi-tab PWA experience
 - **iOS PWA warnings** — Push notification, badge, sync limitations
+- **note_taking** — ChromeOS lock screen quick notes
+- **iarc_rating_id** — Age rating for app store distribution
+- **widgets** — Windows 11 Widgets Board integration
 
 **Grading Scale (percentage-based):**
 

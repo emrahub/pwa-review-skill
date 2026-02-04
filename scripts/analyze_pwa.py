@@ -888,6 +888,37 @@ class PWAAnalyzer:
         elif prefer_related:
             self._add("critical", cat, "prefer_related_applications=true but no apps listed!", "", "prefer_related")
 
+        # ── 13. note_taking capability (info) - ChromeOS Lock Screen Notes ──
+        note_taking = m.get("note_taking")
+        if note_taking:
+            new_note_url = note_taking.get("new_note_url")
+            if new_note_url:
+                self._add("passed", cat, f"note_taking: {new_note_url} (ChromeOS lock screen notes)")
+            else:
+                self._add("info", cat, "note_taking configured but missing new_note_url")
+        else:
+            self._add("info", cat, "No note_taking (ChromeOS lock screen notes integration)")
+
+        # ── 14. iarc_rating_id (info) - Age rating for app stores ──
+        iarc = m.get("iarc_rating_id")
+        if iarc:
+            self._add("passed", cat, f"iarc_rating_id: {iarc[:20]}... (age rating for stores)")
+        else:
+            self._add("info", cat, "No iarc_rating_id (IARC age rating for app store distribution)")
+
+        # ── 15. widgets (info) - Windows 11 Widgets Board ──
+        widgets = m.get("widgets")
+        if widgets:
+            widget_count = len(widgets) if isinstance(widgets, list) else 1
+            self._add("passed", cat, f"widgets: {widget_count} widget(s) for Windows 11 Widgets Board")
+            # Check for valid widget structure
+            if isinstance(widgets, list) and widgets:
+                first = widgets[0]
+                if first.get("name") and first.get("tag"):
+                    self._add("info", cat, f"Widget '{first.get('name')}' with Adaptive Cards template")
+        else:
+            self._add("info", cat, "No widgets (Windows 11 Widgets Board integration)")
+
         return {"score": min(score, 15), "max": 15}
 
     # ── Run All ─────────────────────────────────────────────────────────

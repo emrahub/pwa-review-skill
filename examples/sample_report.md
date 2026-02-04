@@ -126,6 +126,9 @@ These items need improvement:
 - **[PWA Advanced]** No edge_side_panel (Edge sidebar support)
 - **[PWA Advanced]** No tabbed display mode (experimental multi-tab)
 - **[PWA Advanced]** iOS PWA: No badging API, limited background sync, 50MB storage cap
+- **[PWA Advanced]** No note_taking (ChromeOS lock screen notes integration)
+- **[PWA Advanced]** No iarc_rating_id (IARC age rating for app store distribution)
+- **[PWA Advanced]** No widgets (Windows 11 Widgets Board integration)
 
 ## 📌 Prioritized Recommendations
 
