@@ -1,5 +1,13 @@
 # Changelog
 
+## [3.1.1] - 2026-02-04
+
+### Fixed
+- Critical Blocker text: "0/20" → "0/22" for Service Worker category (2 places)
+- Background Sync check now includes `periodicsync` event detection
+
+---
+
 ## [3.1.0] - 2026-02-04
 
 ### Added

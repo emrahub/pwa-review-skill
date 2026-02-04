@@ -150,5 +150,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Version:** 3.1.0
+**Version:** 3.1.1
 **Author:** [@emrahub](https://github.com/emrahub)
