@@ -1,6 +1,6 @@
-# PWA Best Practices Checklist & Scoring — v2.0
+# PWA Best Practices Checklist & Scoring — v2.2
 
-Total: 100 points across 8 categories.
+Total: 108 points across 9 categories.
 
 ## 1. Manifest Compliance (20 pts)
 
@@ -15,7 +15,7 @@ Total: 100 points across 8 categories.
 | background_color | 2 | Valid, used for splash screen |
 | scope | 1 | Present, consistent with start_url |
 
-## 2. Advanced Manifest (10 pts)
+## 2. Advanced Manifest (11 pts)
 
 | Check | Pts | Criteria |
 |-------|-----|----------|
@@ -26,6 +26,8 @@ Total: 100 points across 8 categories.
 | orientation | 1 | Explicit orientation preference |
 | categories | 1 | App store categorization hints |
 | display_override | 1 | Fallback display mode chain |
+| lang | 1 | BCP-47 language code for i18n |
+| dir | — | Text direction (ltr/rtl/auto) — info only |
 | Bonus info | 0 | share_target, protocol_handlers, file_handlers, related_applications |
 
 ## 3. Service Worker & Caching (20 pts)
@@ -39,6 +41,8 @@ Total: 100 points across 8 categories.
 | Cache strategy | 3 | Recognized strategy detected |
 | Cache versioning | 2 | Version identifier in cache names |
 | Workbox | — | Detection as bonus info |
+| Navigation Preload | — | Performance optimization (info only) |
+| Periodic Sync | — | Background updates (info only) |
 
 ### Cache Strategy Types
 - **Cache-First**: `caches.match()` → fallback `fetch()`
@@ -67,7 +71,7 @@ Total: 100 points across 8 categories.
 | apple-touch-icon | 1 | iOS home screen |
 | beforeinstallprompt | — | Custom install UX (info only) |
 
-## 6. Security (10 pts) — NEW
+## 6. Security (10 pts)
 
 | Check | Pts | Criteria |
 |-------|-----|----------|
@@ -106,13 +110,24 @@ Total: 100 points across 8 categories.
 | iOS status bar | 1 | apple-mobile-web-app-status-bar-style |
 | Theme color meta | 1 | `<meta name="theme-color">` in HTML |
 
+## 9. SEO & Discoverability (7 pts) — NEW
+
+| Check | Pts | Criteria |
+|-------|-----|----------|
+| title | 2 | Present, 10-70 chars recommended |
+| meta description | 2 | Present, 50-160 chars recommended |
+| Open Graph | 2 | og:title, og:description, og:image (3+ tags = 2pts) |
+| canonical URL | 1 | `<link rel="canonical">` defined |
+
 ## Grading Scale
 
-| Score | Grade | Label |
-|-------|-------|-------|
-| 90-100 | A+ | Excellent PWA |
-| 80-89 | A | Strong PWA |
-| 70-79 | B | Good — room for improvement |
-| 60-69 | C | Functional — needs significant work |
-| 40-59 | D | Major PWA gaps |
-| 0-39 | F | Not a functional PWA |
+Grades are based on **percentage** of total score (108 pts max):
+
+| Percentage | Grade | Label |
+|------------|-------|-------|
+| 90%+ | A+ | Excellent PWA |
+| 80-89% | A | Strong PWA |
+| 70-79% | B | Good — room for improvement |
+| 60-69% | C | Functional — needs significant work |
+| 40-59% | D | Major PWA gaps |
+| <40% | F | Not a functional PWA |

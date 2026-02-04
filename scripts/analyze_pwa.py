@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Analyze PWA resources and generate scored findings. v2.1 — comprehensive audit."""
+"""Analyze PWA resources and generate scored findings. v2.2 — comprehensive audit."""
 
 import argparse
 import json
@@ -48,6 +48,9 @@ FIX_HINTS = {
     "no_lang": 'Add language: `<html lang="en">` (use your BCP-47 language code).',
     "no_theme_meta": 'Add `<meta name="theme-color" content="#your-color">` in `<head>`. Separate from manifest theme_color.',
     "prefer_related": 'Remove or set to false: `"prefer_related_applications": false` — otherwise browser will NOT show PWA install prompt.',
+    "no_manifest_lang": 'Add `"lang": "en"` (or your BCP-47 language code) to manifest.json for i18n support.',
+    "no_title": 'Add a descriptive `<title>` tag (10-70 chars) in `<head>`.',
+    "no_meta_desc": 'Add `<meta name="description" content="Your description (50-160 chars)">` in `<head>`.',
 }
 
 
@@ -151,13 +154,13 @@ class PWAAnalyzer:
 
         return {"score": min(score, 20), "max": 20}
 
-    # ── 2. Advanced Manifest (10 pts) ───────────────────────────────────
+    # ── 2. Advanced Manifest (11 pts) ───────────────────────────────────
     def analyze_advanced_manifest(self) -> dict:
         score = 0
         cat = "Advanced Manifest"
         if not self.manifest:
             self._add("info", cat, "Skipped — no manifest available")
-            return {"score": 0, "max": 10}
+            return {"score": 0, "max": 11}
         m = self.manifest
 
         # id (1)
@@ -218,6 +221,19 @@ class PWAAnalyzer:
         else:
             self._add("info", cat, "No display_override fallback chain")
 
+        # lang (1) - i18n support
+        if m.get("lang"):
+            score += 1
+            self._add("passed", cat, f"lang: '{m['lang']}' (i18n support)")
+        else:
+            self._add("warnings", cat, "No 'lang' field — needed for i18n", "", "no_manifest_lang")
+
+        # dir (info) - RTL support
+        if m.get("dir") in ("ltr", "rtl", "auto"):
+            self._add("passed", cat, f"dir: '{m['dir']}' (text direction)")
+        else:
+            self._add("info", cat, "No 'dir' field — defaults to 'auto'")
+
         # Bonus info fields (0 pts)
         for field, label in [
             ("share_target", "Web Share Target API"),
@@ -231,7 +247,7 @@ class PWAAnalyzer:
             if m.get(field):
                 self._add("passed", cat, f"{label} configured")
 
-        return {"score": min(score, 10), "max": 10}
+        return {"score": min(score, 11), "max": 11}
 
     # ── 3. Service Worker & Caching (20 pts) ────────────────────────────
     def analyze_service_worker(self) -> dict:
@@ -621,6 +637,67 @@ class PWAAnalyzer:
 
         return {"score": min(score, 10), "max": 10}
 
+    # ── 9. SEO & Discoverability (7 pts) ─────────────────────────────────
+    def analyze_seo(self) -> dict:
+        score = 0
+        cat = "SEO & Discoverability"
+        html = self.html
+
+        # title tag (2 pts)
+        title_match = re.search(r'<title>([^<]+)</title>', html, re.I)
+        if title_match:
+            title = title_match.group(1).strip()
+            if 10 < len(title) < 70:
+                score += 2
+                display = title[:50] + "..." if len(title) > 50 else title
+                self._add("passed", cat, f"title: '{display}' ({len(title)} chars)")
+            else:
+                score += 1
+                self._add("warnings", cat, f"title length {len(title)} — recommend 10-70 chars")
+        else:
+            self._add("warnings", cat, "No <title> tag", "", "no_title")
+
+        # meta description (2 pts)
+        desc_match = re.search(
+            r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']+)["\']', html, re.I)
+        if not desc_match:
+            desc_match = re.search(
+                r'<meta[^>]*content=["\']([^"\']+)["\'][^>]*name=["\']description["\']', html, re.I)
+        if desc_match:
+            desc = desc_match.group(1)
+            if 50 < len(desc) < 160:
+                score += 2
+                self._add("passed", cat, f"meta description: {len(desc)} chars")
+            else:
+                score += 1
+                self._add("warnings", cat, f"meta description {len(desc)} chars — recommend 50-160")
+        else:
+            self._add("warnings", cat, "No meta description", "", "no_meta_desc")
+
+        # Open Graph tags (2 pts)
+        og_tags = ["og:title", "og:description", "og:image", "og:url"]
+        og_found = []
+        for tag in og_tags:
+            if re.search(rf'<meta[^>]*property=["\']' + tag + r'["\']', html, re.I):
+                og_found.append(tag)
+        if len(og_found) >= 3:
+            score += 2
+            self._add("passed", cat, f"Open Graph: {', '.join(og_found)}")
+        elif og_found:
+            score += 1
+            self._add("warnings", cat, f"Partial Open Graph: {', '.join(og_found)}")
+        else:
+            self._add("info", cat, "No Open Graph meta tags (og:title, og:image, etc.)")
+
+        # canonical URL (1 pt)
+        if re.search(r'<link[^>]*rel=["\']canonical["\']', html, re.I):
+            score += 1
+            self._add("passed", cat, "Canonical URL defined")
+        else:
+            self._add("info", cat, "No canonical URL")
+
+        return {"score": min(score, 7), "max": 7}
+
     # ── Run All ─────────────────────────────────────────────────────────
     def analyze(self) -> dict:
         categories = {
@@ -632,15 +709,18 @@ class PWAAnalyzer:
             "security": self.analyze_security(),
             "performance": self.analyze_performance(),
             "ux_accessibility": self.analyze_ux(),
+            "seo": self.analyze_seo(),
         }
         total = sum(c["score"] for c in categories.values())
         mx = sum(c["max"] for c in categories.values())
 
-        if total >= 90: grade = "A+"
-        elif total >= 80: grade = "A"
-        elif total >= 70: grade = "B"
-        elif total >= 60: grade = "C"
-        elif total >= 40: grade = "D"
+        # Grade based on percentage (total max is now 108)
+        pct = (total / mx * 100) if mx > 0 else 0
+        if pct >= 90: grade = "A+"
+        elif pct >= 80: grade = "A"
+        elif pct >= 70: grade = "B"
+        elif pct >= 60: grade = "C"
+        elif pct >= 40: grade = "D"
         else: grade = "F"
 
         return {
