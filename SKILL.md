@@ -1,15 +1,7 @@
 ---
 name: pwa-review
-description: >
-  Comprehensive PWA (Progressive Web App) technical audit and review tool.
-  Analyzes manifest.json, service worker strategies, offline behavior, installability,
-  performance, and UX quality. Use when the user asks to review, audit, analyze, or
-  evaluate a PWA, or when they mention "PWA review", "PWA audit", "service worker analysis",
-  "manifest check", "offline capability test", "installability check", "Lighthouse alternative",
-  or any request to assess a web app's progressive web app compliance and quality.
-  Also triggers when user provides a URL and asks about PWA readiness, app-like experience,
-  or mobile web app quality. Generates a professional report with scores, findings,
-  and actionable recommendations.
+description: Comprehensive PWA technical audit tool. Analyzes manifest.json, service worker, offline behavior, installability, security, performance, and UX. Use when user asks to review/audit a PWA, mentions "PWA review", "manifest check", "service worker analysis", "Lighthouse alternative", or provides a URL asking about PWA readiness.
+invocable: true
 ---
 
 # PWA Review Skill
@@ -18,52 +10,51 @@ Analyze Progressive Web Apps for technical compliance, performance, and UX quali
 
 ## Workflow
 
-1. **Fetch PWA resources** — Use `web_fetch` to retrieve the target URL's HTML
+1. **Fetch PWA resources** — Use the WebFetch tool to retrieve the target URL's HTML
 2. **Discover manifest and service worker** — Run `scripts/discover_pwa.py` to extract manifest URL and SW registration from HTML
-3. **Fetch manifest.json** — Use `web_fetch` on discovered manifest URL
-4. **Fetch service worker** — Use `web_fetch` on discovered SW URL
+3. **Fetch manifest.json** — Use the WebFetch tool on discovered manifest URL
+4. **Fetch service worker** — Use the WebFetch tool on discovered SW URL
 5. **Run analysis** — Execute `scripts/analyze_pwa.py` with fetched content
 6. **Generate report** — Execute `scripts/generate_report.py` to create final .md report
-7. **Present report** — Share the generated report with the user
+7. **Present report** — Display the generated report to the user
 
 ## Step Details
 
 ### Step 1-4: Fetching Resources
 
-Fetch the target URL first. Then run the discovery script to find manifest and service worker paths.
-If paths are relative, resolve them against the base URL before fetching.
+Fetch the target URL first. Save the HTML content to a temporary file, then run the discovery script to find manifest and service worker paths. If paths are relative, resolve them against the base URL before fetching.
 
 ```bash
-python3 scripts/discover_pwa.py --html /tmp/pwa_page.html --base-url "https://example.com"
+python3 scripts/discover_pwa.py --html pwa_page.html --base-url "https://example.com"
 ```
 
 Output: JSON with `manifest_url` and `sw_url` fields.
 
 ### Step 5: Analysis
 
-Save fetched content to temp files, then run:
+Save fetched content to temp files in the current directory, then run:
 
 ```bash
 python3 scripts/analyze_pwa.py \
-  --html /tmp/pwa_page.html \
-  --manifest /tmp/pwa_manifest.json \
-  --sw /tmp/pwa_sw.js \
+  --html pwa_page.html \
+  --manifest pwa_manifest.json \
+  --sw pwa_sw.js \
   --url "https://example.com"
 ```
 
-Output: JSON analysis results at `/tmp/pwa_analysis.json`
+Output: JSON analysis results at `pwa_analysis.json`
 
 ### Step 6: Report Generation
 
 ```bash
 python3 scripts/generate_report.py \
-  --analysis /tmp/pwa_analysis.json \
-  --output /home/claude/pwa_review_report.md
+  --analysis pwa_analysis.json \
+  --output pwa_review_report.md
 ```
 
 ### Step 7: Present
 
-Copy report to `/mnt/user-data/outputs/` and present to user.
+Read and display the generated `pwa_review_report.md` to the user.
 
 ## Handling Missing Resources
 
