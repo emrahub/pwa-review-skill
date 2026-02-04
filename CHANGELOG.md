@@ -1,5 +1,12 @@
 # Changelog
 
+## [5.0.1] - 2026-02-05
+
+### Added
+- **cursor: pointer best practice** — Added to Touch Events & Interactions section. iOS Safari requires `cursor: pointer` CSS on interactive elements to recognize them as clickable. Without this, click/touch events may not fire reliably in PWA mode.
+
+---
+
 ## [5.0.0] - 2026-02-04
 
 ### Added

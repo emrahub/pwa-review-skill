@@ -444,6 +444,7 @@ When generating the report, include these platform-specific notes if relevant:
 - `onClick` handlers may not fire reliably on some iOS versions in PWA mode
 - Add `onTouchEnd` as backup for critical buttons (install, update, submit actions)
 - Use `touch-manipulation` CSS to eliminate 300ms tap delay and prevent double-tap zoom
+- Use `cursor: pointer` CSS on interactive elements - iOS Safari requires this to recognize elements as clickable
 - Use `-webkit-tap-highlight-color: transparent` for clean visual feedback
 - Use `-webkit-user-select: none` on interactive elements to prevent text selection
 
