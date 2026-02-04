@@ -1,5 +1,33 @@
 # Changelog
 
+## [3.0.0] - 2026-02-04
+
+### Changed
+- **BREAKING**: Converted from Python scripts to native Claude Code skill format
+- Embedded complete 123-point checklist directly in SKILL.md
+- Added YAML frontmatter for proper skill registration (`user_invocable: true`)
+- Added executable workflow instructions for Claude (WebFetch-based)
+- Updated README with new installation and usage instructions
+- Expanded to 10 categories (123 total points)
+
+### Added
+- Detailed error handling documentation
+- iOS/Safari limitation notes
+- Report template with exact output format
+- Category-by-category scoring tables
+
+### Removed
+- Python scripts (`discover_pwa.py`, `analyze_pwa.py`, `generate_report.py`) — no longer needed
+- Separate `references/pwa-checklist.md` — now embedded in SKILL.md
+
+### Why This Change
+- Zero dependencies: Works directly in Claude Code without Python
+- Single command: Just run `/pwa-review <url>`
+- Better CORS handling: Claude's WebFetch handles cross-origin requests
+- Self-contained: All checklist items and instructions in one file
+
+---
+
 ## [2.1.0] - 2026-02-04
 
 ### Added
