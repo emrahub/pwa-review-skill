@@ -1,5 +1,33 @@
 # Changelog
 
+## [5.1.0] - 2026-02-05
+
+### Added
+
+#### Mobile Dropdown Positioning (+3 points in UX & Accessibility)
+- **Mobile dropdown positioning** (+2 pts) — Detects `fixed sm:absolute` pattern for dropdowns that break out of positioning context on mobile
+- **Dropdown safe area handling** (+1 pt) — Detects `safe-area-inset-right/left` application for notch devices
+
+#### Update State Management (+2 points in Offline Capability)
+- **Update state persistence** (+1 pt) — Detects localStorage flags (e.g., `pwa-just-updated`) to prevent update prompt re-appearing immediately after update
+- **Touch event double-fire prevention** (+1 pt) — Detects guards against duplicate execution from onClick + onTouchEnd
+
+#### Theme Consistency (+2 points in UX & Accessibility)
+- **Light/dark theme consistency** (+2 pts) — Verifies UI elements have both light and `dark:` variants in Tailwind CSS
+
+### Changed
+- **Total scoring increased from 161 to 168 points**
+- Offline Capability: 12 → 14 points
+- UX & Accessibility: 17 → 22 points
+
+### Notes
+These additions are based on real-world iOS PWA issues discovered during production app testing:
+- Dropdown positioning with `absolute` relative to narrow containers causes viewport overflow on mobile
+- Update prompts re-appearing after user clicks "Update" due to missing state persistence
+- Hardcoded dark colors appearing incorrectly in light theme
+
+---
+
 ## [5.0.2] - 2026-02-05
 
 ### Added

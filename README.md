@@ -1,10 +1,10 @@
 # PWA Review Skill for Claude Code
 
-A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **160-point scoring system**, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **168-point scoring system**, including advanced features and iOS-specific compatibility checks that typical audits miss.
 
 ## Features
 
-- **160-point scoring system** across 11 categories
+- **168-point scoring system** across 11 categories
 - **Beyond Lighthouse**: Checks advanced PWA features like `handle_links`, `launch_handler`, `file_handlers`, `protocol_handlers`
 - **iOS Compatibility**: Safe area handling, splash screens, touch events, notch/Dynamic Island support
 - **Core Web Vitals signals**: LCP, INP, and CLS optimization detection
@@ -20,12 +20,12 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 |----------|--------|----------------|
 | Manifest Compliance | 20 | Required manifest fields (name, icons, display, colors) |
 | Advanced Manifest | 15 | Screenshots, shortcuts, i18n, maskable icons, widgets, iOS splash screens |
-| Service Worker & Caching | 28 | Registration, events, cache strategies, skipWaiting, clients.claim, push, navigation preload |
-| Offline Capability | 12 | Fallback pages, app shell, offline indicators, update UX |
+| Service Worker & Caching | 29 | Registration, events, cache strategies, skipWaiting, clients.claim, push, navigation preload |
+| Offline Capability | 14 | Fallback pages, app shell, offline indicators, update UX, state persistence |
 | Installability | 13 | HTTPS, manifest link, beforeinstallprompt, custom install UI |
 | Security | 16 | CSP, SRI, HTTPS, COOP/COEP, HSTS, Permissions-Policy |
 | Performance Signals | 14 | Render-blocking, lazy loading, resource hints, Core Web Vitals signals |
-| UX & Accessibility | 17 | Viewport, safe areas, touch events, semantic HTML, ARIA, focus indicators |
+| UX & Accessibility | 22 | Viewport, safe areas, touch events, semantic HTML, ARIA, mobile dropdowns, themes |
 | SEO & Discoverability | 7 | Meta tags, Open Graph, structured data |
 | PWA Advanced | 17 | Cutting-edge PWA capabilities, Web Push |
 | iOS Compatibility | 1 | Bonus for complete iOS meta tag set |
@@ -34,12 +34,12 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 
 | Grade | Score Range | Percentage |
 |-------|-------------|------------|
-| A+ | 144+ points | 90%+ |
-| A | 128-143 points | 80-89% |
-| B | 112-127 points | 70-79% |
-| C | 96-111 points | 60-69% |
-| D | 64-95 points | 40-59% |
-| F | <64 points | <40% |
+| A+ | 152+ points | 90%+ |
+| A | 135-151 points | 80-89% |
+| B | 118-134 points | 70-79% |
+| C | 101-117 points | 60-69% |
+| D | 68-100 points | 40-59% |
+| F | <68 points | <40% |
 
 ## Installation
 
@@ -86,7 +86,7 @@ Once installed, invoke the skill with:
 Claude will:
 1. Fetch the HTML from the URL
 2. Discover manifest and service worker locations
-3. Analyze both files against the 160-point checklist
+3. Analyze both files against the 168-point checklist
 4. Generate a detailed report with scores and recommendations
 
 ## Sample Output
@@ -96,7 +96,7 @@ Claude will:
 
 **URL:** https://example.com
 **Date:** 2026-02-04
-**Overall Score:** 148/160 (93%) — Grade: A+
+**Overall Score:** 155/168 (92%) — Grade: A+
 
 ## Score Breakdown
 
@@ -104,12 +104,12 @@ Claude will:
 |----------|-------|--------|
 | Manifest Compliance | 20/20 | ✅ |
 | Advanced Manifest | 15/15 | ✅ |
-| Service Worker & Caching | 26/28 | ✅ |
-| Offline Capability | 12/12 | ✅ |
+| Service Worker & Caching | 27/29 | ✅ |
+| Offline Capability | 14/14 | ✅ |
 | Installability | 13/13 | ✅ |
 | Security | 14/16 | ⚠️ |
 | Performance Signals | 14/14 | ✅ |
-| UX & Accessibility | 17/17 | ✅ |
+| UX & Accessibility | 20/22 | ✅ |
 | SEO & Discoverability | 5/7 | ⚠️ |
 | PWA Advanced | 12/17 | ⚠️ |
 | iOS Compatibility | 1/1 | ✅ |
@@ -151,7 +151,22 @@ Claude will:
 | Cache strategy analysis | Basic | Detailed |
 | iOS-specific guidance | Limited | **Comprehensive** |
 
-## v5.0.0 New Features (iOS & Mobile Focus)
+## v5.1.0 New Features (Mobile UX & State Management)
+
+### Mobile Dropdown Positioning (+3 points in UX)
+- `fixed sm:absolute` positioning pattern detection
+- Viewport-relative vs container-relative positioning check
+- `safe-area-inset-right/left` margin detection for dropdowns
+
+### Update State Management (+2 points in Offline)
+- localStorage flag detection for update state persistence (e.g., `pwa-just-updated`)
+- Double-fire prevention for touch event handlers
+
+### Theme Consistency (+2 points in UX)
+- Light/dark theme variant detection for UI elements
+- Hardcoded color warning (e.g., `bg-zinc-900` without `dark:` counterpart)
+
+## v5.0.0 Features (iOS & Mobile Focus)
 
 ### iOS Safe Area Support (+4 points in UX)
 - `viewport-fit=cover` check for notch/Dynamic Island support
@@ -237,5 +252,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Version:** 5.0.0
+**Version:** 5.1.0
 **Author:** [@emrahub](https://github.com/emrahub)

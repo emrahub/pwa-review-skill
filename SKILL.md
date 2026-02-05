@@ -1,6 +1,6 @@
 ---
 name: pwa-review
-description: Comprehensive 161-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, security, iOS compatibility, and advanced PWA features
+description: Comprehensive 168-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, security, iOS compatibility, and advanced PWA features
 user_invocable: true
 args:
   - name: url
@@ -12,7 +12,7 @@ args:
 
 # PWA Review Skill
 
-A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 161-point scoring system, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 168-point scoring system, including advanced features and iOS-specific compatibility checks that typical audits miss.
 
 ## Scoring Overview
 
@@ -21,11 +21,11 @@ A comprehensive Progressive Web App audit that goes beyond standard Lighthouse t
 | Manifest Compliance | 20 | Essential manifest fields |
 | Advanced Manifest | 15 | Enhanced manifest features + iOS splash |
 | Service Worker & Caching | 29 | SW implementation quality |
-| Offline Capability | 12 | Offline functionality + update UX |
+| Offline Capability | 14 | Offline functionality + update UX + state management |
 | Installability | 13 | Install requirements |
 | Security | 16 | Security measures |
 | Performance Signals | 14 | Performance optimization |
-| UX & Accessibility | 17 | User experience + iOS safe areas |
+| UX & Accessibility | 22 | User experience + iOS safe areas + mobile dropdowns + themes |
 | SEO & Discoverability | 7 | Search optimization |
 | PWA Advanced | 17 | Cutting-edge PWA features |
 | iOS Compatibility | 1 | iOS-specific meta tags (bonus) |
@@ -165,7 +165,7 @@ Output a markdown report following the template at the end of this document.
 
 **Critical Blocker:** If no service worker, this category scores 0/29.
 
-### Category 4: Offline Capability (12 points)
+### Category 4: Offline Capability (14 points)
 
 | Check | Points | How to Verify |
 |-------|--------|---------------|
@@ -175,8 +175,12 @@ Output a markdown report following the template at the end of this document.
 | Network-first or cache-first strategy evident | 2 | fetch handler has clear strategy pattern |
 | Update prompt shown to user | 1 | Code handles SW update with user notification (e.g., "New version available") |
 | Graceful update flow | 1 | Update doesn't force reload without warning, user can choose when to update |
+| Update state persistence | 1 | localStorage flag prevents update prompt re-appearing after update (e.g., `pwa-just-updated`) |
+| Touch event double-fire prevention | 1 | Update/action handlers prevent duplicate execution from onClick + onTouchEnd |
 
 **Update UX Note:** Good PWAs notify users when updates are available and let them choose when to apply the update. Look for patterns like `useRegisterSW`, `workbox-window`, or custom SW update handling with user-facing notifications.
+
+**Update State Note:** After a user clicks "Update", the PWA reloads. Without state management, the update prompt may immediately re-appear because the new service worker is still "waiting". Use localStorage flags (e.g., `pwa-just-updated` with timestamp) to suppress the prompt for a brief period (30 seconds) after update completion. Also implement double-fire prevention for touch handlers - on iOS, both `onClick` and `onTouchEnd` may fire, causing duplicate updates.
 
 ### Category 5: Installability Requirements (13 points)
 
@@ -224,7 +228,7 @@ Output a markdown report following the template at the end of this document.
 | CLS prevention | 1 | Images have width/height, no layout shifts expected |
 | Critical CSS inlined | 1 | Critical styles in <head> or preloaded |
 
-### Category 8: UX & Accessibility (17 points)
+### Category 8: UX & Accessibility (22 points)
 
 | Check | Points | How to Verify |
 |-------|--------|---------------|
@@ -238,10 +242,17 @@ Output a markdown report following the template at the end of this document.
 | Touch event handling for iOS | 1 | Critical buttons have `onTouchEnd` handlers or `touch-manipulation` CSS |
 | Focus indicators visible | 1 | :focus styles not removed, visible outlines (qualitative) |
 | Skip to main content link | 1 | Skip link present for keyboard navigation |
+| Mobile dropdown positioning | 2 | Dropdowns use `fixed` on mobile, `absolute` on desktop with proper margins |
+| Dropdown safe area handling | 1 | Dropdowns apply `safe-area-inset-right/left` for notch devices |
+| Theme consistency (light/dark) | 2 | All UI elements have both light and `dark:` variants in Tailwind/CSS |
 
 **iOS Safe Area Note:** iPhone notch and Dynamic Island require special handling. Without `viewport-fit=cover` and `env(safe-area-inset-*)` CSS, content may be obscured or buttons may be unreachable in PWA standalone mode. Fixed headers should use `padding-top: env(safe-area-inset-top)` and bottom navigation should account for `safe-area-inset-bottom`.
 
 **Touch Event Note:** On iOS, `onClick` handlers may not fire reliably in PWA mode. Critical action buttons (update, install, submit) should include `onTouchEnd` handlers as backup. The CSS property `touch-manipulation` prevents double-tap zoom delays.
+
+**Mobile Dropdown Positioning Note:** Dropdowns positioned with `absolute` relative to a small parent element (like a button) often extend beyond the viewport on mobile. Solution: Use `fixed` positioning on mobile to break out of the parent's positioning context, then use `left-4 right-4` (or similar) for consistent margins instead of transform centering (`left-1/2 -translate-x-1/2`). On desktop (`sm:` breakpoint), revert to `absolute` with `right-0` for proper alignment. Always apply `safe-area-inset-right` via inline style for notch devices.
+
+**Theme Consistency Note:** In Tailwind CSS projects, all UI elements should have both light and dark variants. Look for patterns like `bg-zinc-100 dark:bg-zinc-900`. Hardcoded colors without a `dark:` counterpart (e.g., `bg-zinc-900` alone) will appear incorrectly in light mode. Common problem areas: tooltips, buttons, borders, and dropdown backgrounds.
 
 ### Category 9: SEO & Discoverability (7 points)
 
@@ -303,6 +314,9 @@ Output a markdown report following the template at the end of this document.
 - No `env(safe-area-inset-*)` usage for fixed elements
 - Missing iOS splash screens
 - No update notification UX for users
+- No update state persistence (prompt may re-appear after update)
+- Dropdowns use absolute positioning without mobile viewport handling
+- Hardcoded colors without light/dark theme variants
 
 ### Informational (Nice to Have)
 - Missing advanced manifest features
@@ -323,7 +337,7 @@ Generate the report in this exact format:
 
 **URL:** [analyzed URL]
 **Date:** [current date]
-**Overall Score:** [X]/161 ([percentage]%) — Grade: [letter grade]
+**Overall Score:** [X]/168 ([percentage]%) — Grade: [letter grade]
 
 ---
 
@@ -334,11 +348,11 @@ Generate the report in this exact format:
 | Manifest Compliance | X/20 | [status emoji] |
 | Advanced Manifest | X/15 | [status emoji] |
 | Service Worker & Caching | X/29 | [status emoji] |
-| Offline Capability | X/12 | [status emoji] |
+| Offline Capability | X/14 | [status emoji] |
 | Installability | X/13 | [status emoji] |
 | Security | X/16 | [status emoji] |
 | Performance Signals | X/14 | [status emoji] |
-| UX & Accessibility | X/17 | [status emoji] |
+| UX & Accessibility | X/22 | [status emoji] |
 | SEO & Discoverability | X/7 | [status emoji] |
 | PWA Advanced | X/17 | [status emoji] |
 | iOS Compatibility | X/1 | [status emoji] |
@@ -390,7 +404,7 @@ Status: Pass (80%+), Warn (50-79%), Fail (<50%)
 
 ---
 
-*Generated by PWA Review Skill v5.0.2*
+*Generated by PWA Review Skill v5.1.0*
 ```
 
 ---
