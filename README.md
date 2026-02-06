@@ -1,10 +1,10 @@
 # PWA Review Skill for Claude Code
 
-A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **168-point scoring system**, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **173-point scoring system**, including advanced features and iOS-specific compatibility checks that typical audits miss.
 
 ## Features
 
-- **168-point scoring system** across 11 categories
+- **173-point scoring system** across 11 categories
 - **Beyond Lighthouse**: Checks advanced PWA features like `handle_links`, `launch_handler`, `file_handlers`, `protocol_handlers`
 - **iOS Compatibility**: Safe area handling, splash screens, touch events, notch/Dynamic Island support
 - **Core Web Vitals signals**: LCP, INP, and CLS optimization detection
@@ -25,7 +25,7 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 | Installability | 13 | HTTPS, manifest link, beforeinstallprompt, custom install UI |
 | Security | 16 | CSP, SRI, HTTPS, COOP/COEP, HSTS, Permissions-Policy |
 | Performance Signals | 14 | Render-blocking, lazy loading, resource hints, Core Web Vitals signals |
-| UX & Accessibility | 22 | Viewport, safe areas, touch events, semantic HTML, ARIA, mobile dropdowns, themes |
+| UX & Accessibility | 27 | Viewport, safe areas, touch events, semantic HTML, ARIA, mobile dropdowns, extended themes |
 | SEO & Discoverability | 7 | Meta tags, Open Graph, structured data |
 | PWA Advanced | 17 | Cutting-edge PWA capabilities, Web Push |
 | iOS Compatibility | 1 | Bonus for complete iOS meta tag set |
@@ -34,12 +34,12 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 
 | Grade | Score Range | Percentage |
 |-------|-------------|------------|
-| A+ | 152+ points | 90%+ |
-| A | 135-151 points | 80-89% |
-| B | 118-134 points | 70-79% |
-| C | 101-117 points | 60-69% |
-| D | 68-100 points | 40-59% |
-| F | <68 points | <40% |
+| A+ | 156+ points | 90%+ |
+| A | 139-155 points | 80-89% |
+| B | 122-138 points | 70-79% |
+| C | 104-121 points | 60-69% |
+| D | 70-103 points | 40-59% |
+| F | <70 points | <40% |
 
 ## Installation
 
@@ -86,7 +86,7 @@ Once installed, invoke the skill with:
 Claude will:
 1. Fetch the HTML from the URL
 2. Discover manifest and service worker locations
-3. Analyze both files against the 168-point checklist
+3. Analyze both files against the 173-point checklist
 4. Generate a detailed report with scores and recommendations
 
 ## Sample Output
@@ -96,7 +96,7 @@ Claude will:
 
 **URL:** https://example.com
 **Date:** 2026-02-04
-**Overall Score:** 155/168 (92%) — Grade: A+
+**Overall Score:** 160/173 (92%) — Grade: A+
 
 ## Score Breakdown
 
@@ -109,7 +109,7 @@ Claude will:
 | Installability | 13/13 | ✅ |
 | Security | 14/16 | ⚠️ |
 | Performance Signals | 14/14 | ✅ |
-| UX & Accessibility | 20/22 | ✅ |
+| UX & Accessibility | 25/27 | ✅ |
 | SEO & Discoverability | 5/7 | ⚠️ |
 | PWA Advanced | 12/17 | ⚠️ |
 | iOS Compatibility | 1/1 | ✅ |
@@ -151,7 +151,18 @@ Claude will:
 | Cache strategy analysis | Basic | Detailed |
 | iOS-specific guidance | Limited | **Comprehensive** |
 
-## v5.1.0 New Features (Mobile UX & State Management)
+## v5.2.0 New Features (Extended Theme Checks)
+
+### Extended Theme Patterns (+5 points in UX)
+- **Dark overlay theme pairs** (+1 pt) — Detects `bg-black/X` patterns without `dark:` prefix
+- **Border visibility pairs** (+1 pt) — Detects `border-white/X` without light alternative
+- **Hover state theme pairs** (+1 pt) — Detects hover backgrounds missing dual variants
+- **Gradient theme support** (+1 pt) — Detects gradient stops without theme variants
+- **Contextual text-white** (+1 pt) — Detects white text on non-colored backgrounds
+
+These checks address common issues where alpha/opacity-based colors work in dark mode but fail in light mode.
+
+## v5.1.0 Features (Mobile UX & State Management)
 
 ### Mobile Dropdown Positioning (+3 points in UX)
 - `fixed sm:absolute` positioning pattern detection
@@ -252,5 +263,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Version:** 5.1.0
+**Version:** 5.2.0
 **Author:** [@emrahub](https://github.com/emrahub)

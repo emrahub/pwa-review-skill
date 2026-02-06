@@ -1,6 +1,6 @@
 ---
 name: pwa-review
-description: Comprehensive 168-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, security, iOS compatibility, and advanced PWA features
+description: Comprehensive 173-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, security, iOS compatibility, and advanced PWA features
 user_invocable: true
 args:
   - name: url
@@ -12,7 +12,7 @@ args:
 
 # PWA Review Skill
 
-A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 168-point scoring system, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 173-point scoring system, including advanced features and iOS-specific compatibility checks that typical audits miss.
 
 ## Scoring Overview
 
@@ -25,7 +25,7 @@ A comprehensive Progressive Web App audit that goes beyond standard Lighthouse t
 | Installability | 13 | Install requirements |
 | Security | 16 | Security measures |
 | Performance Signals | 14 | Performance optimization |
-| UX & Accessibility | 22 | User experience + iOS safe areas + mobile dropdowns + themes |
+| UX & Accessibility | 27 | User experience + iOS safe areas + mobile dropdowns + themes |
 | SEO & Discoverability | 7 | Search optimization |
 | PWA Advanced | 17 | Cutting-edge PWA features |
 | iOS Compatibility | 1 | iOS-specific meta tags (bonus) |
@@ -228,7 +228,7 @@ Output a markdown report following the template at the end of this document.
 | CLS prevention | 1 | Images have width/height, no layout shifts expected |
 | Critical CSS inlined | 1 | Critical styles in <head> or preloaded |
 
-### Category 8: UX & Accessibility (22 points)
+### Category 8: UX & Accessibility (27 points)
 
 | Check | Points | How to Verify |
 |-------|--------|---------------|
@@ -245,6 +245,11 @@ Output a markdown report following the template at the end of this document.
 | Mobile dropdown positioning | 2 | Dropdowns use `fixed` on mobile, `absolute` on desktop with proper margins |
 | Dropdown safe area handling | 1 | Dropdowns apply `safe-area-inset-right/left` for notch devices |
 | Theme consistency (light/dark) | 2 | All UI elements have both light and `dark:` variants in Tailwind/CSS |
+| Dark overlay theme pairs | 1 | `bg-black/X` patterns have `dark:` prefix (e.g., `bg-white/60 dark:bg-black/60`) |
+| Border visibility pairs | 1 | `border-white/X` has light alternative (e.g., `border-zinc-200 dark:border-white/10`) |
+| Hover state theme pairs | 1 | Hover backgrounds have both variants (e.g., `hover:bg-zinc-100 dark:hover:bg-white/10`) |
+| Gradient theme support | 1 | Gradient stops have variants (e.g., `from-white/80 dark:from-black/80`) |
+| Contextual text-white | 1 | White text only on colored backgrounds, not transparent overlays |
 
 **iOS Safe Area Note:** iPhone notch and Dynamic Island require special handling. Without `viewport-fit=cover` and `env(safe-area-inset-*)` CSS, content may be obscured or buttons may be unreachable in PWA standalone mode. Fixed headers should use `padding-top: env(safe-area-inset-top)` and bottom navigation should account for `safe-area-inset-bottom`.
 
@@ -253,6 +258,14 @@ Output a markdown report following the template at the end of this document.
 **Mobile Dropdown Positioning Note:** Dropdowns positioned with `absolute` relative to a small parent element (like a button) often extend beyond the viewport on mobile. Solution: Use `fixed` positioning on mobile to break out of the parent's positioning context, then use `left-4 right-4` (or similar) for consistent margins instead of transform centering (`left-1/2 -translate-x-1/2`). On desktop (`sm:` breakpoint), revert to `absolute` with `right-0` for proper alignment. Always apply `safe-area-inset-right` via inline style for notch devices.
 
 **Theme Consistency Note:** In Tailwind CSS projects, all UI elements should have both light and dark variants. Look for patterns like `bg-zinc-100 dark:bg-zinc-900`. Hardcoded colors without a `dark:` counterpart (e.g., `bg-zinc-900` alone) will appear incorrectly in light mode. Common problem areas: tooltips, buttons, borders, and dropdown backgrounds.
+
+**Extended Theme Checks Note:** Alpha/opacity-based colors (`bg-black/60`, `border-white/10`, `from-black/80`) are commonly used for dark mode but invisible or wrong in light mode. Each pattern needs a light mode counterpart:
+- `bg-black/60` → `bg-white/60 dark:bg-black/60`
+- `border-white/10` → `border-zinc-200 dark:border-white/10`
+- `hover:bg-black/10` → `hover:bg-zinc-100 dark:hover:bg-white/10`
+- `from-black/80` → `from-white/80 dark:from-black/80`
+- `text-white` on overlays → `text-zinc-900 dark:text-white`
+These patterns are frequently missed because they work in dark mode (the default design) but break in light mode.
 
 ### Category 9: SEO & Discoverability (7 points)
 
@@ -317,6 +330,11 @@ Output a markdown report following the template at the end of this document.
 - No update state persistence (prompt may re-appear after update)
 - Dropdowns use absolute positioning without mobile viewport handling
 - Hardcoded colors without light/dark theme variants
+- `bg-black/X` patterns without `dark:` prefix (invisible in light mode)
+- `border-white/X` patterns without light alternative (invisible in light mode)
+- `hover:bg-black/X` or `hover:bg-white/X` without theme pair
+- Gradient stops without theme variants
+- `text-white` on transparent/overlay backgrounds (unreadable in light mode)
 
 ### Informational (Nice to Have)
 - Missing advanced manifest features
@@ -337,7 +355,7 @@ Generate the report in this exact format:
 
 **URL:** [analyzed URL]
 **Date:** [current date]
-**Overall Score:** [X]/168 ([percentage]%) — Grade: [letter grade]
+**Overall Score:** [X]/173 ([percentage]%) — Grade: [letter grade]
 
 ---
 
@@ -352,7 +370,7 @@ Generate the report in this exact format:
 | Installability | X/13 | [status emoji] |
 | Security | X/16 | [status emoji] |
 | Performance Signals | X/14 | [status emoji] |
-| UX & Accessibility | X/22 | [status emoji] |
+| UX & Accessibility | X/27 | [status emoji] |
 | SEO & Discoverability | X/7 | [status emoji] |
 | PWA Advanced | X/17 | [status emoji] |
 | iOS Compatibility | X/1 | [status emoji] |
@@ -404,7 +422,7 @@ Status: Pass (80%+), Warn (50-79%), Fail (<50%)
 
 ---
 
-*Generated by PWA Review Skill v5.1.0*
+*Generated by PWA Review Skill v5.2.0*
 ```
 
 ---

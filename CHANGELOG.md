@@ -1,5 +1,39 @@
 # Changelog
 
+## [5.2.0] - 2026-02-06
+
+### Added
+
+#### Extended Theme Pattern Checks (+5 points in UX & Accessibility)
+- **Dark overlay theme pairs** (+1 pt) — Detects `bg-black/X` patterns that need `dark:` prefix (e.g., `bg-white/60 dark:bg-black/60`)
+- **Border visibility pairs** (+1 pt) — Detects `border-white/X` that needs light alternative (e.g., `border-zinc-200 dark:border-white/10`)
+- **Hover state theme pairs** (+1 pt) — Detects hover backgrounds missing dual variants (e.g., `hover:bg-zinc-100 dark:hover:bg-white/10`)
+- **Gradient theme support** (+1 pt) — Detects gradient stops without theme variants (e.g., `from-white/80 dark:from-black/80`)
+- **Contextual text-white** (+1 pt) — Detects white text on non-colored/transparent backgrounds
+
+### Changed
+- **Total scoring increased from 168 to 173 points**
+- UX & Accessibility: 22 → 27 points
+- Updated grading scale thresholds:
+  - A+: 156+ points (90%+)
+  - A: 139-155 points (80-89%)
+  - B: 122-138 points (70-79%)
+  - C: 104-121 points (60-69%)
+  - D: 70-103 points (40-59%)
+  - F: <70 points (<40%)
+
+### Notes
+These additions are based on real-world theme issues discovered during LookNex PWA production testing:
+- `bg-black/60` overlays invisible/wrong in light mode
+- `border-white/10` borders invisible in light mode
+- `hover:bg-black/10` hover states not visible in light mode
+- `from-black/80` gradients incorrect in light mode
+- `text-white` on transparent overlays unreadable in light mode
+
+Alpha/opacity colors are commonly used for dark mode but require explicit light mode counterparts.
+
+---
+
 ## [5.1.0] - 2026-02-05
 
 ### Added
