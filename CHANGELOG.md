@@ -1,5 +1,39 @@
 # Changelog
 
+## [5.5.0] - 2026-02-28
+
+### Added
+
+#### Real-Time Connection Resilience (+5 points in Offline Capability)
+- **Visibility change reconnection** (+2 pts) — Detects `visibilitychange` event listener that triggers WebSocket/real-time reconnection when the page becomes visible again. Critical for mobile PWAs where backgrounding kills WebSocket connections.
+- **Real-time reconnection strategy** (+2 pts) — Detects `reconnectionAttempts` configuration (should be high or `Infinity`) with progressive backoff (`reconnectionDelayMax`). Also checks for manual retry UI and `reconnect_failed` event handling.
+- **Connection room re-subscribe** (+1 pt) — Detects persistent `connect` event listener that re-joins rooms/channels after reconnection, not just on initial connection. Without this, real-time events stop flowing after reconnection.
+
+#### SPA State Persistence (+2 points in UX & Accessibility)
+- **SPA view state persistence** (+2 pts) — Detects localStorage persistence of active view/tab/conversation IDs so users don't lose their position when navigating away and back. Includes graceful handling of stale IDs (e.g., 404 responses for deleted resources).
+
+### Changed
+- **Total scoring increased from 185 to 192 points**
+- Offline Capability: 19 → 24 points
+- UX & Accessibility: 27 → 29 points
+- Updated grading scale thresholds:
+  - A+: 173+ points (90%+)
+  - A: 154-172 points (80-89%)
+  - B: 135-153 points (70-79%)
+  - C: 116-134 points (60-69%)
+  - D: 77-115 points (40-59%)
+  - F: <77 points (<40%)
+
+### Notes
+Based on real-world PWA mobile UX bugs discovered during OryoNex production use:
+- Mobile PWA users frequently switch between apps; WebSocket connections die silently with close code 1005
+- Default socket.io config (5 reconnection attempts, 5s max delay) is exhausted in ~15 seconds — user may be away for hours
+- After WebSocket reconnection, server-side room memberships are lost; events stop flowing unless rooms are re-joined
+- SPA navigation (back button, gesture, tab switch) unmounts components and destroys state; users return to empty views
+- These patterns are universal to any PWA with real-time features (chat, collaboration, notifications)
+
+---
+
 ## [5.4.0] - 2026-02-07
 
 ### Added

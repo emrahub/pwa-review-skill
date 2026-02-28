@@ -1,6 +1,6 @@
 ---
 name: pwa-review
-description: Comprehensive 185-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, security, iOS compatibility, and advanced PWA features
+description: Comprehensive 192-point PWA audit beyond Lighthouse - analyzes manifest, service worker, offline capabilities, real-time resilience, security, iOS compatibility, and advanced PWA features
 user_invocable: true
 args:
   - name: url
@@ -12,7 +12,7 @@ args:
 
 # PWA Review Skill
 
-A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 185-point scoring system, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit that goes beyond standard Lighthouse testing. This skill analyzes PWAs across 11 categories with a 192-point scoring system, including real-time connection resilience, advanced features, and iOS-specific compatibility checks that typical audits miss.
 
 ## Scoring Overview
 
@@ -21,16 +21,16 @@ A comprehensive Progressive Web App audit that goes beyond standard Lighthouse t
 | Manifest Compliance | 20 | Essential manifest fields |
 | Advanced Manifest | 15 | Enhanced manifest features + iOS splash |
 | Service Worker & Caching | 33 | SW implementation quality + caching strategies |
-| Offline Capability | 19 | Offline functionality + storage + sync triggers |
+| Offline Capability | 24 | Offline functionality + storage + sync + real-time resilience |
 | Installability | 13 | Install requirements |
 | Security | 16 | Security measures |
 | Performance Signals | 17 | Performance optimization + network detection |
-| UX & Accessibility | 27 | User experience + iOS safe areas + mobile dropdowns + themes |
+| UX & Accessibility | 29 | User experience + iOS safe areas + mobile dropdowns + themes + state persistence |
 | SEO & Discoverability | 7 | Search optimization |
 | PWA Advanced | 17 | Cutting-edge PWA features |
 | iOS Compatibility | 1 | iOS-specific meta tags (bonus) |
 
-**Grading Scale:** A+ (90%+), A (80-89%), B (70-79%), C (60-69%), D (40-59%), F (<40%)
+**Grading Scale:** A+ (173+, 90%+), A (154-172, 80-89%), B (135-153, 70-79%), C (116-134, 60-69%), D (77-115, 40-59%), F (<77, <40%)
 
 ---
 
@@ -176,7 +176,7 @@ Look for patterns like `new CacheFirst()`, `new NetworkFirst()`, or explicit str
 
 **Cache Expiration Note:** Without expiration limits, caches grow unbounded and can exceed storage quotas. Look for `ExpirationPlugin` with `maxEntries` or `maxAgeSeconds`, or custom cleanup logic in the fetch handler.
 
-### Category 4: Offline Capability (19 points)
+### Category 4: Offline Capability (24 points)
 
 | Check | Points | How to Verify |
 |-------|--------|---------------|
@@ -193,6 +193,9 @@ Look for patterns like `new CacheFirst()`, `new NetworkFirst()`, or explicit str
 | Storage quota monitoring | 1 | Code uses `navigator.storage.estimate()` for storage health checks |
 | Background sync client trigger | 1 | Client triggers `registration.sync.register()` when coming back online |
 | Periodic sync registration | 1 | Client registers `registration.periodicSync.register()` on app init |
+| Visibility change reconnection | 2 | Code listens to `visibilitychange` event and triggers WebSocket/real-time reconnection when page becomes visible |
+| Real-time reconnection strategy | 2 | WebSocket/Socket.io configured with sufficient reconnection attempts (>5 or Infinity) and progressive backoff |
+| Connection room re-subscribe | 1 | After real-time reconnection, rooms/channels are re-joined automatically (not only on initial connect) |
 
 **Update UX Note:** Good PWAs notify users when updates are available and let them choose when to apply the update. Look for patterns like `useRegisterSW`, `workbox-window`, or custom SW update handling with user-facing notifications.
 
@@ -203,6 +206,23 @@ Look for patterns like `new CacheFirst()`, `new NetworkFirst()`, or explicit str
 **Update State Note:** After a user clicks "Update", the PWA reloads. Without state management, the update prompt may immediately re-appear because the new service worker is still "waiting". Use localStorage flags (e.g., `pwa-just-updated` with timestamp) to suppress the prompt for a brief period (30 seconds) after update completion. Also implement double-fire prevention for touch handlers - on iOS, both `onClick` and `onTouchEnd` may fire, causing duplicate updates.
 
 **Offline Storage Note:** For complex PWAs with user-generated content, localStorage alone is insufficient. Use IndexedDB for structured data storage (images, generation history, preferences). Request persistent storage with `navigator.storage.persist()` to prevent iOS from evicting data after 7 days of inactivity. Monitor storage quota with `navigator.storage.estimate()` to warn users before running out of space.
+
+**Visibility Change Reconnection Note:** When a PWA is minimized, tab-switched, or the user navigates to another app on mobile, WebSocket/real-time connections silently die. The browser fires `visibilitychange` when the user returns, but most apps don't listen for it. Without a `visibilitychange` handler that checks connection state and triggers reconnection, users return to a permanently disconnected app. This is especially critical on iOS where PWAs are effectively frozen when backgrounded. Look for:
+```javascript
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && !socket.connected) {
+    socket.connect(); // or custom reconnect logic
+  }
+});
+```
+
+**Real-Time Reconnection Strategy Note:** Socket.io and similar libraries default to limited reconnection attempts (e.g., 5 attempts). In a PWA context where users may background the app for hours, 5 attempts are exhausted in ~15 seconds — long before the user returns. Production PWAs should configure `reconnectionAttempts: Infinity` with a reasonable `reconnectionDelayMax` (e.g., 30 seconds) for progressive backoff. Also provide a manual retry mechanism in the UI so users can trigger immediate reconnection. Look for:
+- `reconnectionAttempts` configuration (should be high or Infinity)
+- `reconnectionDelayMax` configuration (should be >5000ms)
+- Manual reconnect button or tap-to-retry UI
+- `reconnect_failed` event handling
+
+**Connection Room Re-Subscribe Note:** After a WebSocket reconnection, the server-side room/channel memberships are lost. If the app only joins rooms on initial connection (e.g., in a `useEffect([workspaceId])` that doesn't re-trigger on reconnect), real-time events stop flowing after reconnection. The fix is to listen for the `connect` event persistently and re-join rooms on every reconnection — not just the first connection. Look for patterns where room-joining logic is called inside a persistent `connect` event listener rather than a self-removing one.
 
 ### Category 5: Installability Requirements (13 points)
 
@@ -265,7 +285,7 @@ if (conn?.effectiveType === '2g' || conn?.saveData) {
 }
 ```
 
-### Category 8: UX & Accessibility (27 points)
+### Category 8: UX & Accessibility (29 points)
 
 | Check | Points | How to Verify |
 |-------|--------|---------------|
@@ -287,6 +307,7 @@ if (conn?.effectiveType === '2g' || conn?.saveData) {
 | Hover state theme pairs | 1 | Hover backgrounds have both variants (e.g., `hover:bg-zinc-100 dark:hover:bg-white/10`) |
 | Gradient theme support | 1 | Gradient stops have variants (e.g., `from-white/80 dark:from-black/80`) |
 | Contextual text-white | 1 | White text only on colored backgrounds, not transparent overlays |
+| SPA view state persistence | 2 | Active view/tab/conversation ID persisted to localStorage so navigation back restores user's position |
 
 **iOS Safe Area Note:** iPhone notch and Dynamic Island require special handling. Without `viewport-fit=cover` and `env(safe-area-inset-*)` CSS, content may be obscured or buttons may be unreachable in PWA standalone mode. Fixed headers should use `padding-top: env(safe-area-inset-top)` and bottom navigation should account for `safe-area-inset-bottom`.
 
@@ -303,6 +324,8 @@ if (conn?.effectiveType === '2g' || conn?.saveData) {
 - `from-black/80` → `from-white/80 dark:from-black/80`
 - `text-white` on overlays → `text-zinc-900 dark:text-white`
 These patterns are frequently missed because they work in dark mode (the default design) but break in light mode.
+
+**SPA View State Persistence Note:** In SPA-based PWAs, navigating away from a view (back button, tab switch, or mobile gesture) unmounts React/Vue components, destroying all in-memory state. When the user returns, they lose their position — active chat conversation, selected tab, scroll position, form data, etc. This is especially painful on mobile PWAs where accidental back gestures are common. The fix is lightweight: persist critical view identifiers (active conversation ID, selected tab, last viewed item) to localStorage keyed by context (e.g., `chat-active-${workspaceId}`). On mount, restore from localStorage and load data from the API. Don't cache full data in localStorage — just the identifier needed to restore the view. Also handle stale IDs gracefully (e.g., if a persisted conversation ID returns 404, clear it and show the default view instead of an error).
 
 ### Category 9: SEO & Discoverability (7 points)
 
@@ -372,6 +395,10 @@ These patterns are frequently missed because they work in dark mode (the default
 - `hover:bg-black/X` or `hover:bg-white/X` without theme pair
 - Gradient stops without theme variants
 - `text-white` on transparent/overlay backgrounds (unreadable in light mode)
+- No `visibilitychange` handler for real-time reconnection (connection lost when returning to app)
+- WebSocket reconnection attempts too low (≤5 exhausted before user returns)
+- No room/channel re-subscribe after real-time reconnection (events stop flowing)
+- No SPA view state persistence (user loses position on navigation)
 
 ### Informational (Nice to Have)
 - Missing advanced manifest features
@@ -402,7 +429,7 @@ Generate the report in this exact format:
 
 **URL:** [analyzed URL]
 **Date:** [current date]
-**Overall Score:** [X]/185 ([percentage]%) — Grade: [letter grade]
+**Overall Score:** [X]/192 ([percentage]%) — Grade: [letter grade]
 
 ---
 
@@ -413,11 +440,11 @@ Generate the report in this exact format:
 | Manifest Compliance | X/20 | [status emoji] |
 | Advanced Manifest | X/15 | [status emoji] |
 | Service Worker & Caching | X/33 | [status emoji] |
-| Offline Capability | X/19 | [status emoji] |
+| Offline Capability | X/24 | [status emoji] |
 | Installability | X/13 | [status emoji] |
 | Security | X/16 | [status emoji] |
 | Performance Signals | X/17 | [status emoji] |
-| UX & Accessibility | X/27 | [status emoji] |
+| UX & Accessibility | X/29 | [status emoji] |
 | SEO & Discoverability | X/7 | [status emoji] |
 | PWA Advanced | X/17 | [status emoji] |
 | iOS Compatibility | X/1 | [status emoji] |
@@ -469,7 +496,7 @@ Status: Pass (80%+), Warn (50-79%), Fail (<50%)
 
 ---
 
-*Generated by PWA Review Skill v5.4.0*
+*Generated by PWA Review Skill v5.5.0*
 ```
 
 ---
@@ -484,7 +511,7 @@ Status: Pass (80%+), Warn (50-79%), Fail (<50%)
 
 ### Service Worker Not Found
 - Score Category 3 (Service Worker & Caching) as 0/33
-- Score Category 4 (Offline Capability) as 0/19
+- Score Category 4 (Offline Capability) as 0/24
 - Reduce Category 5 (Installability) by 2 points
 - Add CRITICAL issue: "No service worker registered"
 - Continue with remaining categories
@@ -512,6 +539,13 @@ When generating the report, include these platform-specific notes if relevant:
 - iOS Safari: Storage limited to ~50MB (may be evicted under storage pressure)
 - iOS Safari: No persistent storage API
 - Safari: Service worker scope limitations more strict
+
+### Real-Time Connections
+- iOS PWAs are frozen when backgrounded — WebSocket connections die silently (close code 1005)
+- When user returns to the app, socket.io's limited reconnection attempts may already be exhausted
+- `visibilitychange` event is the reliable signal for detecting return from background on both iOS and Android
+- After reconnection, server-side room memberships are lost — must re-join rooms on every `connect` event
+- SPA component state is destroyed on navigation — persist critical IDs (active conversation, selected tab) to localStorage
 
 ### Safe Area & Display (Critical for PWA Mode)
 - **Notch/Dynamic Island**: Without `viewport-fit=cover` in viewport meta, `env(safe-area-inset-*)` won't work

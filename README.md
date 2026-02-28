@@ -1,10 +1,10 @@
 # PWA Review Skill for Claude Code
 
-A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **185-point scoring system**, including advanced features and iOS-specific compatibility checks that typical audits miss.
+A comprehensive Progressive Web App audit skill that goes beyond standard Lighthouse testing. Analyzes PWAs across **11 categories** with a **192-point scoring system**, including real-time connection resilience, advanced features, and iOS-specific compatibility checks that typical audits miss.
 
 ## Features
 
-- **185-point scoring system** across 11 categories
+- **192-point scoring system** across 11 categories
 - **Beyond Lighthouse**: Checks advanced PWA features like `handle_links`, `launch_handler`, `file_handlers`, `protocol_handlers`
 - **iOS Compatibility**: Safe area handling, splash screens, touch events, notch/Dynamic Island support
 - **Core Web Vitals signals**: LCP, INP, and CLS optimization detection
@@ -21,11 +21,11 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 | Manifest Compliance | 20 | Required manifest fields (name, icons, display, colors) |
 | Advanced Manifest | 15 | Screenshots, shortcuts, i18n, maskable icons, widgets, iOS splash screens |
 | Service Worker & Caching | 33 | Registration, events, cache strategies, message handler, expiration config |
-| Offline Capability | 19 | Fallback pages, app shell, sync triggers, IndexedDB, persistent storage |
+| Offline Capability | 24 | Fallback pages, app shell, sync triggers, IndexedDB, real-time resilience |
 | Installability | 13 | HTTPS, manifest link, beforeinstallprompt, custom install UI |
 | Security | 16 | CSP, SRI, HTTPS, COOP/COEP, HSTS, Permissions-Policy |
 | Performance Signals | 17 | Render-blocking, lazy loading, resource hints, Network Info API, compression |
-| UX & Accessibility | 27 | Viewport, safe areas, touch events, semantic HTML, ARIA, mobile dropdowns |
+| UX & Accessibility | 29 | Viewport, safe areas, touch events, semantic HTML, ARIA, SPA state persistence |
 | SEO & Discoverability | 7 | Meta tags, Open Graph, structured data |
 | PWA Advanced | 17 | Cutting-edge PWA capabilities, Web Push |
 | iOS Compatibility | 1 | Bonus for complete iOS meta tag set |
@@ -34,12 +34,12 @@ A comprehensive Progressive Web App audit skill that goes beyond standard Lighth
 
 | Grade | Score Range | Percentage |
 |-------|-------------|------------|
-| A+ | 167+ points | 90%+ |
-| A | 148-166 points | 80-89% |
-| B | 130-147 points | 70-79% |
-| C | 111-129 points | 60-69% |
-| D | 74-110 points | 40-59% |
-| F | <74 points | <40% |
+| A+ | 173+ points | 90%+ |
+| A | 154-172 points | 80-89% |
+| B | 135-153 points | 70-79% |
+| C | 116-134 points | 60-69% |
+| D | 77-115 points | 40-59% |
+| F | <77 points | <40% |
 
 ## Installation
 
@@ -86,7 +86,7 @@ Once installed, invoke the skill with:
 Claude will:
 1. Fetch the HTML from the URL
 2. Discover manifest and service worker locations
-3. Analyze both files against the 185-point checklist
+3. Analyze both files against the 192-point checklist
 4. Generate a detailed report with scores and recommendations
 
 ## Sample Output
@@ -148,8 +148,24 @@ Claude will:
 | **iOS Splash Screens** | ❌ | ✅ |
 | **Touch Event handling** | ❌ | ✅ |
 | **Update UX patterns** | ❌ | ✅ |
+| **Visibility change reconnection** | ❌ | ✅ |
+| **Real-time reconnection strategy** | ❌ | ✅ |
+| **Room re-subscribe on reconnect** | ❌ | ✅ |
+| **SPA view state persistence** | ❌ | ✅ |
 | Cache strategy analysis | Basic | Detailed |
 | iOS-specific guidance | Limited | **Comprehensive** |
+
+## v5.5.0 New Features (Real-Time Connection Resilience)
+
+### Real-Time Connection Resilience (+5 points in Offline Capability)
+- **Visibility change reconnection** (+2 pts) — Detects `visibilitychange` listener for WebSocket reconnection on tab return
+- **Real-time reconnection strategy** (+2 pts) — Detects proper `reconnectionAttempts` (>5 or Infinity) with progressive backoff
+- **Connection room re-subscribe** (+1 pt) — Detects persistent `connect` listener for room re-join after reconnection
+
+### SPA State Persistence (+2 points in UX & Accessibility)
+- **SPA view state persistence** (+2 pts) — Detects localStorage persistence for active view/conversation IDs with stale ID handling
+
+These checks address real-world mobile PWA UX bugs where backgrounding kills WebSocket connections and SPA navigation destroys user state.
 
 ## v5.4.0 New Features (Sync Integration & Adaptive Performance)
 
@@ -292,5 +308,5 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Version:** 5.4.0
+**Version:** 5.5.0
 **Author:** [@emrahub](https://github.com/emrahub)
